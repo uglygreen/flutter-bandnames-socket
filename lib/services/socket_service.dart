@@ -1,45 +1,57 @@
-
-
-
 import 'package:flutter/material.dart';
-import 'package:socket_io_client/socket_io_client.dart' as IO;
-
-
+import 'package:socket_io_client/socket_io_client.dart';
 
 enum ServerStatus {
+  // ignore: constant_identifier_names
   Online,
+  // ignore: constant_identifier_names
   Offline,
+  // ignore: constant_identifier_names
   Connecting
 }
 
 class SocketService with ChangeNotifier {
+  ServerStatus _serverStatus = ServerStatus.Connecting;
+  late Socket _socket;
 
- ServerStatus _serverStatus = ServerStatus.Connecting;
+  ServerStatus get serverStatus => _serverStatus;
+  Socket get socket => _socket;
 
-
-get serverStatus => _serverStatus;
-
-  SocketService(){
+  SocketService() {
     _initConfig();
   }
 
-  void _initConfig(){
-    IO.Socket socket = IO.io('http://localhost:3000',
-    IO.OptionBuilder()
-      .setTransports(['websocket'])
-      .enableAutoConnect()  // disable auto-connection
-      .build()
-    );
-    
+  void _initConfig() {
+    _socket = io('http://192.168.1.201:4500/', {
+      'transports': ['websocket'],
+      'autoConnect': true
+    });
 
-      socket.onConnect((_) {
-        _serverStatus = ServerStatus.Online;
-        notifyListeners();
-      });
-      socket.onDisconnect((_) {
-        _serverStatus = ServerStatus.Offline;
-        notifyListeners();
-      });
+    // _socket.on('connect', (_) {
+    //   _serverStatus = ServerStatus.Online;
+    //   notifyListeners();
+    // });
+    _socket.on('connect', (_) {
+      print('connect');
+      _serverStatus = ServerStatus.Online;
+      notifyListeners();
+    });
 
+    _socket.on('disconnect', (_) {
+      _serverStatus = ServerStatus.Offline;
+      notifyListeners();
+    });
+
+    // _socket.on('disconnect', (_) {
+    //   _serverStatus = ServerStatus.Offline;
+    //   notifyListeners();
+    // });
+
+    socket.on('nuevo-mensaje', (payload) {
+      print(payload);
+    });
+
+    // add this line
+    socket.connect();
   }
 }

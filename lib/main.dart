@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
         initialRoute: 'status',
         routes: {
           'home': ( _ ) => const HomePage(),
-          'status': ( _ ) => StatusPage()
+          'status': ( _ ) => const StatusPage()
         },
       ),
     );
