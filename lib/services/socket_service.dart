@@ -16,23 +16,19 @@ class SocketService with ChangeNotifier {
 
   ServerStatus get serverStatus => _serverStatus;
   Socket get socket => _socket;
+  Function get emit => _socket.emit;
 
   SocketService() {
     _initConfig();
   }
 
   void _initConfig() {
-    _socket = io('http://192.168.1.201:4500/', {
+    _socket = io('http://10.0.2.2:3000/', {
       'transports': ['websocket'],
       'autoConnect': true
     });
 
-    // _socket.on('connect', (_) {
-    //   _serverStatus = ServerStatus.Online;
-    //   notifyListeners();
-    // });
     _socket.on('connect', (_) {
-      print('connect');
       _serverStatus = ServerStatus.Online;
       notifyListeners();
     });
@@ -42,16 +38,8 @@ class SocketService with ChangeNotifier {
       notifyListeners();
     });
 
-    // _socket.on('disconnect', (_) {
-    //   _serverStatus = ServerStatus.Offline;
-    //   notifyListeners();
-    // });
-
     socket.on('nuevo-mensaje', (payload) {
       print(payload);
     });
-
-    // add this line
-    socket.connect();
   }
 }
